@@ -1,0 +1,4 @@
+well_id,formation_name,net_pay,reservoir_temp_celsius,heat_in_place_pj,thermal_power_mwth
+1,"Sherwood Sandstone",301,21.990611307644766,0,0
+2,"Carboniferous Fault",306,40.973340012668785,0.76231,0.120863
+3,"Onlap Trias / Socle",269,14.362534086943558,0,0
