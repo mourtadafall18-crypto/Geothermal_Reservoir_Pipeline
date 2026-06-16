@@ -30,11 +30,22 @@ def get_data():
         df = pd.read_sql(query, conn)
         conn.close()
         return df
-    except Exception as e:
-        # Si la connexion échoue (Cloud), on charge le fichier CSV de secours
-        st.warning("Mode hors-ligne : chargement des données depuis le fichier CSV.")
-        return pd.read_csv("heatverify.csv")
-
+    except:
+        # Mode secours avec conversion forcée
+        df = pd.read_csv("heatverify.csv")
+        
+        # Liste des colonnes numériques critiques pour votre dashboard
+        num_cols = ['clean_porosity_pct', 'gamma_ray_api', 'geothermal_gradient_c_per_km', 'depth_meters']
+        
+        for col in num_cols:
+            if col in df.columns:
+                # Force la conversion en nombre, transforme les erreurs en NaN
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+        
+        # Supprime les lignes où ces données cruciales seraient vides
+        df = df.dropna(subset=['clean_porosity_pct'])
+        
+        return df
 # --- Configuration ---
 st.set_page_config(page_title="Geothermal Reservoir Asset Manager", layout="wide")
 
@@ -64,7 +75,6 @@ well_selection = st.sidebar.multiselect("Active Well Inventory", df['well_id'].u
 
 filtered_df = df[df['well_id'].isin(well_selection)] if well_selection else df
 filtered_df = filtered_df[filtered_df['clean_porosity_pct'] >= porosity_threshold]
-
 # --- Main Dashboard ---
 st.title("🌐 Geothermal Reservoir Asset Manager")
 
