@@ -6,18 +6,37 @@ import io
 import os
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from dotenv import load_dotenv
+
+load_dotenv()
+
+@st.cache_data
+def get_data():
+    # On définit les paramètres de connexion
+    host = os.getenv("DB_HOST", "localhost")
+    user = os.getenv("DB_USER", "root")
+    password = os.getenv("DB_PASSWORD", "mourtada@123")
+    database = os.getenv("DB_NAME", "GeoEnergy_Exploration")
+
+    try:
+        # Tentative de connexion MySQL
+        conn = mysql.connector.connect(
+            host=host,
+            user=user,
+            password=password,
+            database=database
+        )
+        query = "SELECT * FROM Well_Logs_Enriched" # Mettez ici votre requête SQL
+        df = pd.read_sql(query, conn)
+        conn.close()
+        return df
+    except Exception as e:
+        # Si la connexion échoue (Cloud), on charge le fichier CSV de secours
+        st.warning("Mode hors-ligne : chargement des données depuis le fichier CSV.")
+        return pd.read_csv("heatverify.csv")
 
 # --- Configuration ---
 st.set_page_config(page_title="Geothermal Reservoir Asset Manager", layout="wide")
-
-# --- Database Connection (Cached) ---
-@st.cache_data
-def get_data():
-    conn = mysql.connector.connect(host="localhost", user="root", 
-                                   password="mourtada@123", database="GeoEnergy_Exploration")
-    df = pd.read_sql("SELECT * FROM Well_Logs_Enriched", conn)
-    conn.close()
-    return df
 
 df = get_data()
 
