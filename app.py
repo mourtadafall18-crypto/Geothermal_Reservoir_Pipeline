@@ -15,7 +15,7 @@ def get_data():
     # On définit les paramètres de connexion
     host = os.getenv("DB_HOST", "localhost")
     user = os.getenv("DB_USER", "root")
-    password = os.getenv("DB_PASSWORD", "mourtada@123")
+    password = os.getenv("DB_PASSWORD")
     database = os.getenv("DB_NAME", "GeoEnergy_Exploration")
 
     try:
